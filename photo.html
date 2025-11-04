@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photo to PDF Converter</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<style>
+  /* ---------- Existing web design CSS (unchanged) ---------- */
+  body { font-family: 'Roboto', sans-serif; margin:0; background:#f5f5f5; color:#333; }
+  header { display:flex; justify-content:space-between; align-items:center; padding:20px 50px; background:white; box-shadow:0 2px 5px rgba(0,0,0,0.1); position:sticky; top:0; z-index:100; }
+  header .logo { font-family:'Poppins',sans-serif; font-size:24px; color:#FF4B2B; }
+  header nav a { margin:0 10px; color:#FF4B2B; text-decoration:none; font-weight:500; transition:0.3s; }
+  header nav a:hover { color:#FF416C; }
+  .header-buttons { display:flex; align-items:center; gap:15px; }
+  .login-btn { padding:10px 20px; background:#FF4B2B; color:white; border:none; border-radius:25px; cursor:pointer; transition:0.3s; font-weight:500; }
+  .login-btn:hover { background:#FF416C; }
+  .photo-btn { padding:10px 20px; background:linear-gradient(45deg,#3b82f6,#2563eb); color:white; border:none; border-radius:25px; cursor:pointer; transition:0.3s; font-weight:500; }
+  .photo-btn:hover { background:linear-gradient(45deg,#2563eb,#1d4ed8); transform:scale(1.05); }
+
+  .hero { text-align:center; padding:80px 20px 50px; }
+  .hero h1 { font-family:'Poppins',sans-serif; font-size:36px; margin-bottom:20px; }
+
+  /* ---------- Updated Photo Input Box CSS ---------- */
+  .upload-box {
+    border: 2px dashed #FF4B2B;
+    border-radius: 15px;
+    padding: 30px;
+    width: 80%;
+    max-width: 600px;
+    margin: 20px auto;
+    background:white;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+  }
+
+  .upload-box:hover {
+    border-color:#FF416C;
+    background: #fff0f5;
+  }
+
+  .upload-box i {
+    font-size: 50px;
+    color:#FF4B2B;
+    margin-bottom:10px;
+  }
+
+  .upload-box p {
+    font-size: 16px;
+    color:#555;
+    text-align: center;
+  }
+
+  #photoInput {
+    display: none;
+  }
+
+  .preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  .preview-container img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+  }
+
+  .hero button {
+    padding:15px 30px;
+    font-size:18px;
+    border:none;
+    border-radius:30px;
+    background:linear-gradient(45deg,#FF4B2B,#FF416C);
+    color:white;
+    cursor:pointer;
+    transition:0.3s;
+    margin-top:20px;
+  }
+
+  .hero button:hover { transform:scale(1.05); }
+
+  /* ---------- Other sections CSS (same as index.html) ---------- */
+  .features, .about, .contact, footer { 
+    .features {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    padding: 50px 20px;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 250px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.card h3 {
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 10px;
+}
+
+.about {
+    background: #fff;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.about h2 {
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 10px;
+}
+
+.about p {
+    max-width: 600px;
+    margin: 0 auto 20px;
+    font-size: 16px;
+}
+
+.social-icons a {
+    display: inline-block;
+    margin: 0 10px;
+    color: #FF4B2B;
+    font-size: 24px;
+    transition: 0.3s;
+    text-decoration: none;
+}
+
+.social-icons a:hover {
+    color: #FF416C;
+}
+
+.contact {
+    background: #f9f9f9;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.contact .contact-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.contact .contact-links a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    color: white;
+    border-radius: 25px;
+    text-decoration: none;
+    font-size: 18px;
+    transition: 0.3s;
+}
+
+.contact .contact-links a i {
+    font-size: 22px;
+}
+
+.contact .contact-links a.whatsapp {
+    background: #25D366;
+}
+
+.contact .contact-links a.whatsapp:hover {
+    background: #128C7E;
+}
+
+.contact .contact-links a.instagram {
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+}
+
+.contact .contact-links a.instagram:hover {
+    opacity: 0.9;
+}
+
+footer {
+    background: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 50px;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+}
+
+  }
+
+.features {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    padding: 50px 20px;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 250px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.card h3 {
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 10px;
+}
+
+.about {
+    background: #fff;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.about h2 {
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 10px;
+}
+
+.about p {
+    max-width: 600px;
+    margin: 0 auto 20px;
+    font-size: 16px;
+}
+
+.social-icons a {
+    display: inline-block;
+    margin: 0 10px;
+    color: #FF4B2B;
+    font-size: 24px;
+    transition: 0.3s;
+    text-decoration: none;
+}
+
+.social-icons a:hover {
+    color: #FF416C;
+}
+
+.contact {
+    background: #f9f9f9;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.contact .contact-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.contact .contact-links a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    color: white;
+    border-radius: 25px;
+    text-decoration: none;
+    font-size: 18px;
+    transition: 0.3s;
+}
+
+.contact .contact-links a i {
+    font-size: 22px;
+}
+
+.contact .contact-links a.whatsapp {
+    background: #25D366;
+}
+
+.contact .contact-links a.whatsapp:hover {
+    background: #128C7E;
+}
+
+.contact .contact-links a.instagram {
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+}
+
+.contact .contact-links a.instagram:hover {
+    opacity: 0.9;
+}
+
+footer {
+    background: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 50px;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+}
+
+header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Existing Download Button (unchanged) */
+.login-btn {
+  padding: 10px 20px;
+  background: #FF4B2B;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: 500;
+}
+
+.login-btn:hover {
+  background: #FF416C;
+}
+
+/* New Text to PDF Button */
+.text-btn {
+  padding: 10px 20px;
+  background: linear-gradient(45deg, #FF4B2B, #FF416C);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: 500;
+}
+
+.text-btn:hover {
+  background: linear-gradient(45deg, #FF416C, #FF1E56);
+  transform: scale(1.05);
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Photos2PDF</div>
+  <nav>
+    <a href="#">About</a> |
+    <a href="#">Contact</a> |
+    <a href="#">Privacy</a>
+  </nav>
+  <div class="header-buttons">
+    <button class="text-btn" onclick="window.open('index.html', '_blank')">Text to PDF</button>
+    <button class="login-btn">Download App</button>
+  </div>
+</header>
+
+<section class="hero">
+  <h1>Convert Your Photos to PDF Instantly</h1>
+
+  <div class="upload-box" id="uploadBox">
+    <i class="fas fa-camera"></i>
+    <p>Click or drag & drop photos here<br>or use camera icon</p>
+    <input type="file" id="photoInput" multiple accept="image/*" capture="environment">
+  </div>
+
+  <div class="preview-container" id="previewContainer"></div>
+
+  <button id="convertPhotoBtn">Convert to PDF</button>
+</section>
+
+<section class="features">
+  <div class="card"><h3>Fast & Secure</h3><p>Upload and convert images in seconds.</p></div>
+  <div class="card"><h3>No Sign-Up Required</h3><p>Just choose images and get your PDF instantly.</p></div>
+  <div class="card"><h3>High Quality</h3><p>Maintains image clarity in your final PDF.</p></div>
+</section>
+
+<section class="about">
+  <h2>Saksham Kumar</h2>
+  <p>Hi! I am Saksham, a passionate web developer who loves creating simple and user-friendly web apps. You can connect with me on social media below.</p>
+  <div class="social-icons">
+    <a href="#" target="_blank"><i class="fab fa-github"></i></a>
+    <a href="#" target="_blank"><i class="fab fa-linkedin"></i></a>
+    <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+    <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+  </div>
+</section>
+
+<section class="contact">
+  <h2>Contact Me</h2>
+  <div class="contact-links">
+    <a href="https://wa.link/zd0a4t" target="_blank" class="whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+    <a href="https://www.instagram.com/_saksham.0x?igsh=NG5nNmtpcXNicm9t" target="_blank" class="instagram"><i class="fab fa-instagram"></i> Instagram</a>
+  </div>
+</section>
+
+<footer>
+  &copy; 2025 Saksham Kumar. All Rights Reserved.
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const uploadBox = document.getElementById('uploadBox');
+const photoInput = document.getElementById('photoInput');
+const previewContainer = document.getElementById('previewContainer');
+
+let photos = [];
+
+// Open file selector on click
+uploadBox.addEventListener('click', () => photoInput.click());
+
+// Handle file selection
+photoInput.addEventListener('change', (e) => {
+  const files = Array.from(e.target.files);
+  photos = photos.concat(files);
+  renderPreviews();
+});
+
+// Render image previews
+function renderPreviews() {
+  previewContainer.innerHTML = '';
+  photos.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(e){
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      previewContainer.appendChild(img);
+    }
+    reader.readAsDataURL(file);
+  });
+}
+
+// Convert to PDF
+document.getElementById('convertPhotoBtn').addEventListener('click', async () => {
+  if(photos.length === 0) {
+    alert("Please select some photos first!");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  for(let i=0; i<photos.length; i++){
+    const imgData = await fileToDataURL(photos[i]);
+    const img = new Image();
+    img.src = imgData;
+
+    await new Promise(resolve => {
+      img.onload = () => {
+        const imgWidth = 180;
+        const imgHeight = (img.height * imgWidth) / img.width;
+        if(i !== 0) doc.addPage();
+        doc.addImage(imgData, 'JPEG', 15, 20, imgWidth, imgHeight);
+        resolve();
+      }
+    });
+  }
+
+  doc.save("photos2pdf.pdf");
+});
+
+// Helper function
+function fileToDataURL(file){
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.readAsDataURL(file);
+  });
+}
+</script>
+
+</body>
+</html>
